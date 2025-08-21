@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .discover-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .discover-header h3 {
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .btn-my-profile {
+        background: #fff;
+        color: #2575fc;
+        font-weight: 600;
+        border-radius: 30px;
+        padding: 6px 18px;
+        transition: all 0.3s ease;
+    }
+    .btn-my-profile:hover {
+        background: #2575fc;
+        color: #fff;
+    }
+
+    .user-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .user-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    }
+
+    .user-avatar {
+        width: 96px;
+        height: 96px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #2575fc;
+        margin-bottom: 10px;
+        transition: transform 0.3s ease;
+    }
+    .user-card:hover .user-avatar {
+        transform: scale(1.05);
+    }
+
+    .user-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #2575fc;
+        margin-bottom: 5px;
+    }
+
+    .user-bio {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .btn-view-profile {
+        background: #2575fc;
+        color: #fff;
+        border-radius: 30px;
+        font-weight: 600;
+        padding: 6px 20px;
+        transition: all 0.3s ease;
+    }
+    .btn-view-profile:hover {
+        background: #6a11cb;
+        transform: scale(1.05);
+    }
+</style>
+
+<div class="container py-4">
+    <div class="discover-header">
+        <h3>✨ Discover New People</h3>
+        {% if user.is_authenticated %}
+            <a class="btn btn-my-profile" href="{% url 'accounts:profile_detail' user.username %}">My Profile</a>
+        {% endif %}
+    </div>
+
+    <div class="row mt-3">
+        {% for u in users %}
+            <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+                <div class="user-card">
+                    <a href="{% url 'accounts:profile_detail' u.username %}" class="text-decoration-none">
+                        {% if u.profile.avatar %}
+                            <img src="{{ u.profile.avatar.url }}" alt="Avatar" class="user-avatar">
+                        {% else %}
+                            <div class="user-avatar bg-light d-inline-block"></div>
+                        {% endif %}
+                        <div class="user-name">{{ u.username }}</div>
+                    </a>
+                    <p class="user-bio">{{ u.profile.bio|truncatewords:12 }}</p>
+                    <a href="{% url 'accounts:profile_detail' u.username %}" class="btn btn-view-profile btn-sm">View Profile</a>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center text-light">No users found.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

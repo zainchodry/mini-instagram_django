@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h3 class="mb-3 text-center">Notifications</h3>
+            <ul class="list-group shadow-sm rounded">
+                {% for n in notifications %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center {% if not n.is_read %}fw-bold bg-light{% endif %}">
+                        <div>
+                            <small class="text-muted">{{ n.timestamp|naturaltime }}</small><br>
+                            <span>{{ n.actor.username }}</span>
+                            {% if n.verb == 'like' %}
+                                <span> liked your post.</span>
+                            {% elif n.verb == 'comment' %}
+                                <span> commented on your post.</span>
+                            {% elif n.verb == 'follow' %}
+                                <span> started following you.</span>
+                            {% endif %}
+                        </div>
+                        <div>
+                            {% if not n.is_read %}
+                                <a href="{% url 'notifications:mark_read' n.pk %}" class="btn btn-sm btn-outline-primary">
+                                    Mark as Read
+                                </a>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item text-center text-muted py-4">
+                        No notifications yet.
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+<style>
+    /* Page Background */
+    body {
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .post-container {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        margin-top: 30px;
+    }
+
+    .post-image {
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .post-details {
+        padding: 20px;
+    }
+
+    .author-info a {
+        text-decoration: none;
+        font-weight: 700;
+        color: #2575fc;
+    }
+
+    .author-info small {
+        color: #888;
+    }
+
+    .btn-like {
+        background: #f8f9fa;
+        border-radius: 30px;
+        font-weight: 600;
+        color: #2575fc;
+        transition: all 0.3s ease;
+    }
+    .btn-like:hover, .btn-like.active {
+        background: #2575fc;
+        color: #fff;
+    }
+
+    .post-caption {
+        font-size: 1rem;
+        color: #333;
+        margin-top: 10px;
+        margin-bottom: 15px;
+    }
+
+    .comments-section h6 {
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .comment-box {
+        background: #f9f9f9;
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+    }
+
+    .comment-box strong a {
+        color: #2575fc;
+        text-decoration: none;
+    }
+
+    .comment-box small {
+        color: #999;
+    }
+
+    .btn-comment {
+        background: #2575fc;
+        border-radius: 30px;
+        font-weight: 600;
+        color: #fff;
+        transition: all 0.3s ease;
+    }
+    .btn-comment:hover {
+        background: #6a11cb;
+    }
+</style>
+
+<div class="container">
+    <div class="row post-container">
+        <!-- Post Image -->
+        <div class="col-md-7 p-0">
+            <img src="{{ post.image.url }}" alt="Post Image" class="img-fluid post-image">
+        </div>
+
+        <!-- Post Details -->
+        <div class="col-md-5 post-details">
+            <!-- Author & Like Button -->
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="author-info">
+                    <a href="{% url 'accounts:profile_detail' post.author.username %}">{{ post.author.username }}</a>
+                    <div class="small">{{ post.created_at|date:"M d, Y H:i" }}</div>
+                </div>
+                <form method="post" action="{% url 'posts:toggle_like' post.pk %}">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-like {% if is_liked %}active{% endif %}">
+                        {% if is_liked %}
+                            <i class="bi bi-heart-fill"></i> Unlike
+                        {% else %}
+                            <i class="bi bi-heart"></i> Like
+                        {% endif %}
+                    </button>
+                </form>
+            </div>
+
+            <!-- Caption -->
+            <div class="post-caption">
+                <p>{{ post.caption|linebreaksbr }}</p>
+            </div>
+
+            <hr>
+
+            <!-- Comments -->
+            <div class="comments-section">
+                <h6>💬 Comments ({{ post.comments_count }})</h6>
+                <ul class="list-unstyled">
+                    {% for comment in post.comments.all %}
+                        <li class="comment-box">
+                            <strong>
+                                <a href="{% url 'accounts:profile_detail' comment.author.username %}">
+                                    {{ comment.author.username }}
+                                </a>
+                            </strong>
+                            <p class="mb-1">{{ comment.text|linebreaksbr }}</p>
+                            <small>{{ comment.created_at|naturaltime }}</small>
+                            {% if user == comment.author or user == post.author %}
+                                <div><a class="text-danger small" href="{% url 'posts:delete_comment' post.pk comment.pk %}">Delete</a></div>
+                            {% endif %}
+                        </li>
+                    {% empty %}
+                        <li class="text-muted">No comments yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Add Comment -->
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'posts:add_comment' post.pk %}">
+                    {% csrf_token %}
+                    {{ comment_form.as_p }}
+                    <button class="btn btn-comment btn-sm mt-2">Add Comment</button>
+                </form>
+            {% else %}
+                <p><a href="{% url 'accounts:login' %}">Login</a> to like or comment.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
