@@ -41,5 +41,5 @@ It supports user accounts, posts (with images and captions), likes, comments, fo
 
 1. Clone project:
    ```bash
-   git clone <mini_instagram_django>
+   git clone git@github.com:zainchodry/mini-instagram_django.git
    cd mini-instagram_django
